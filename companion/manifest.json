@@ -1,16 +1,16 @@
 {
-	"id": "your-module-name",
-	"name": "your-module-name",
-	"shortname": "module-shortname",
-	"description": "A short one line description of your module",
-	"version": "0.0.0",
+	"id": "bosch-ccs100d",
+	"name": "Bosch CCS100D",
+	"shortname": "CCS100D",
+	"description": "Monitor wich microphones are active",
+	"version": "1.0.0",
 	"license": "MIT",
-	"repository": "git+https://github.com/bitfocus/companion-module-your-module-name.git",
-	"bugs": "https://github.com/bitfocus/companion-module-your-module-name/issues",
+	"repository": "git+https://github.com/raultilves/companion-module-bosch-ccs100d",
+	"bugs": "https://github.com/raultilves/companion-module-bosch-ccs100d/issues",
 	"maintainers": [
 		{
-			"name": "Your name",
-			"email": "Your email"
+			"name": "Raul Santana",
+			"email": "raulsantanatilves710@gmail.com"
 		}
 	],
 	"runtime": {
@@ -20,7 +20,7 @@
 		"entrypoint": "../src/main.js"
 	},
 	"legacyIds": [],
-	"manufacturer": "Your company",
-	"products": ["Your product"],
-	"keywords": []
+	"manufacturer": "Bosch",
+	"products": ["CCS100D"],
+	"keywords": ["conference", "microphone", "audio"]
 }
