@@ -14,6 +14,8 @@ class BoschCCS1000DInstance extends InstanceBase {
 		this.isLoggedIn = false
 		this.seats = [] // all mics
 		this.speakers = [] // active mics
+		this.lastSpeaker = {} // last active mic with priority
+		this.sid = null // session id for authentication
 
 	}
 
@@ -52,8 +54,16 @@ class BoschCCS1000DInstance extends InstanceBase {
 		try {
 			const response = await axios.post(`http://${this.config.server_ip}/api/login`, authPayload)
 			// Response handling
-			this.isLoggedIn = true
-			console.log('Login successful:', response.data)
+
+			// If the API returns a session id, store it and set a Cookie header for subsequent requests
+			if (response && response.data && response.data.sid) {
+				this.log('info', 'Bosch CCS 1000 D login successful')
+				this.isLoggedIn = true
+				this.sid = response.data.sid
+				axios.defaults.headers.common['Cookie'] = `sid=${this.sid}`
+				this.log('info', 'SID Cookie set successfully')
+			}
+			
 		} catch (error) {
 			this.log('error', 'Login failed: ' + error.message)
 		}
@@ -67,14 +77,31 @@ class BoschCCS1000DInstance extends InstanceBase {
 			}
 
 			try {
-				const response = await axios.get(`http://${this.config.server_ip}/speakers`)
+				const response = await axios.get(`http://${this.config.server_ip}/api/speakers`)
 				// Process response and update variables/feedbacks
-				console.log('Speakers:', response.data)
+
+				if (response.status === 401) {
+					this.log('error', 'Unauthorized. Check your credentials.')
+					this.isLoggedIn = false
+					return
+				}
+				if (response.data) {
+					if (response.data.length > 0) {
+						this.speakers = response.data
+						this.lastSpeaker = this.speakers.find(s => s.prio === true) || this.speakers[0]
+						this.log('info', `Active speakers: ${this.speakers.map(s => s.name).join(', ')}`)
+					} else {
+						this.speakers = []
+						this.log('info', 'No active speakers')
+					}
+					this.updateFeedbacks()
+					this.updateVariableDefinitions()
+				}
 			} catch (error) {
 				this.log('error', 'Polling failed: ' + error.message)
 				this.isLoggedIn = false // Force re-login on next poll
 			}
-		}, this.config.pollInterval || 500)
+		}, this.config.pollInterval || 250)
 	}
 
 	// When module gets deleted
