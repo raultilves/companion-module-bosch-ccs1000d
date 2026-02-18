@@ -1,8 +1,8 @@
 {
-	"id": "bosch-ccs100d",
-	"name": "Bosch CCS100D",
-	"shortname": "CCS100D",
-	"description": "Monitor wich microphones are active",
+	"id": "bosch-ccs1000d",
+	"name": "Bosch CCS1000D",
+	"shortname": "CCS1000D",
+	"description": "Monitor active microfones",
 	"version": "1.0.0",
 	"license": "MIT",
 	"repository": "git+https://github.com/raultilves/companion-module-bosch-ccs100d",
@@ -21,6 +21,6 @@
 	},
 	"legacyIds": [],
 	"manufacturer": "Bosch",
-	"products": ["CCS100D"],
+	"products": ["CCS1000D"],
 	"keywords": ["conference", "microphone", "audio"]
 }

@@ -1,5 +1,5 @@
 {
-	"name": "bosch-ccs100d",
+	"name": "bosch-ccs1000d",
 	"version": "0.1.0",
 	"main": "src/main.js",
 	"scripts": {
@@ -16,7 +16,8 @@
 		"yarn": "^4"
 	},
 	"dependencies": {
-		"@companion-module/base": "~1.14.1"
+		"@companion-module/base": "~1.14.1",
+		"axios": "^1.13.5"
 	},
 	"devDependencies": {
 		"@companion-module/tools": "^2.6.1",
