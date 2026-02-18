@@ -1,0 +1,26 @@
+{
+	"id": "bosch-ccs1000d",
+	"name": "Bosch CCS1000D",
+	"shortname": "CCS1000D",
+	"description": "Monitor active microfones",
+	"version": "1.0.0",
+	"license": "MIT",
+	"repository": "git+https://github.com/raultilves/companion-module-bosch-ccs100d",
+	"bugs": "https://github.com/raultilves/companion-module-bosch-ccs100d/issues",
+	"maintainers": [
+		{
+			"name": "Raul Santana",
+			"email": "raulsantanatilves710@gmail.com"
+		}
+	],
+	"runtime": {
+		"type": "node22",
+		"api": "nodejs-ipc",
+		"apiVersion": "0.0.0",
+		"entrypoint": "../src/main.js"
+	},
+	"legacyIds": [],
+	"manufacturer": "Bosch",
+	"products": ["CCS1000D"],
+	"keywords": ["conference", "microphone", "audio"]
+}

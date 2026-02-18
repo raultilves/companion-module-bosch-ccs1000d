@@ -1,0 +1,3 @@
+# BOSCH CCS1000D COMPANION MODULE
+
+See [HELP.md](./companion/HELP.md) and [LICENSE](./LICENSE)
