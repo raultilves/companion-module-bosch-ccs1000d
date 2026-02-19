@@ -12,11 +12,13 @@ class BoschCCS1000DInstance extends InstanceBase {
 
 		this.isInitialized = false
 		this.isLoggedIn = false
-		this.seats = [] // all mics
-		this.speakers = [] // active mics
-		this.lastSpeaker = {} // last active mic with priority
 		this.sid = null // session id for authentication
 
+		this.seats = [] // all mics
+		this.speakers = [] // active mics
+
+		this.mainSpeaker = {} // the only speaker or the speaker with priority
+		this.lastMainSpeaker = null // ID of last speaker to track changes for variable updates
 	}
 
 	async init(config) {
@@ -69,39 +71,63 @@ class BoschCCS1000DInstance extends InstanceBase {
 		}
 	}
 
-	async startPolling() {
+	async startPolling() { // Continuously poll for speaker updates and check login status
 		this.pollingInterval = setInterval(async () => {
 			if (!this.isLoggedIn) {
 				await this.logIn()
 				return
 			}
 
-			try {
-				const response = await axios.get(`http://${this.config.server_ip}/api/speakers`)
-				// Process response and update variables/feedbacks
-
-				if (response.status === 401) {
-					this.log('error', 'Unauthorized. Check your credentials.')
-					this.isLoggedIn = false
-					return
-				}
-				if (response.data) {
-					if (response.data.length > 0) {
-						this.speakers = response.data
-						this.lastSpeaker = this.speakers.find(s => s.prio === true) || this.speakers[0]
-						this.log('info', `Active speakers: ${this.speakers.map(s => s.name).join(', ')}`)
-					} else {
-						this.speakers = []
-						this.log('info', 'No active speakers')
-					}
-					this.updateFeedbacks()
-					this.updateVariableDefinitions()
-				}
-			} catch (error) {
-				this.log('error', 'Polling failed: ' + error.message)
-				this.isLoggedIn = false // Force re-login on next poll
-			}
+			await this.getSpeakers()
+			
 		}, this.config.pollInterval || 250)
+	}
+
+	async getSpeakers() { // Fetch current active speakers from the API and update variables
+		try {
+			const response = await axios.get(`http://${this.config.server_ip}/api/speakers`)
+				
+			// Handle unauthorized response (e.g., session expired)
+			if (response.status === 401) {
+				this.log('error', 'Unauthorized. Check your credentials.')
+				this.isLoggedIn = false
+				return
+			}
+			if (response.data) {
+				if (response.data.length > 0) { // If there are active speakers
+					this.speakers = response.data
+
+					// Find the speaker with priority (prio === true) or default to the first one if none have priority
+					this.mainSpeaker = this.speakers.find(s => s.prio === true) || this.speakers[0]
+					
+					// Check if the main speaker has changed since the last poll to avoid unnecessary variable updates
+					if (this.lastMainSpeaker !== this.mainSpeaker.id) {
+						this.lastMainSpeaker = this.mainSpeaker.id
+						this.setVariableValues({
+							active_mic: this.mainSpeaker.id // Update variable with the ID of the active microphone
+						})
+					}
+
+					this.log('info', `Active speakers: ${this.speakers.map(s => s.name).join(', ')}`)
+					this.log('info', `Main speaker: ${this.mainSpeaker.name}`)
+				} else { // If no active speakers, clear the variable and reset main speaker
+					this.speakers = []
+
+					if (this.lastMainSpeaker !== null) { // Only update variable if there was a previous speaker to avoid unnecessary updates
+						this.lastMainSpeaker = null
+						this.setVariableValues({
+							active_mic: 0 // Clear variable when no active speakers. 0 Means no active microphone
+						})
+					}
+					this.log('info', 'No active speakers')
+				}
+				this.updateFeedbacks()
+				this.updateVariableDefinitions()
+			}
+		} catch (error) {
+			this.log('error', 'Polling failed: ' + error.message)
+			this.isLoggedIn = false // Force re-login on next poll
+		}
 	}
 
 	// When module gets deleted

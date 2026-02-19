@@ -1,7 +1,5 @@
 module.exports = function (self) {
 	self.setVariableDefinitions([
-		{ variableId: 'variable1', name: 'My first variable' },
-		{ variableId: 'variable2', name: 'My second variable' },
-		{ variableId: 'variable3', name: 'Another variable' },
+		{ variableId: 'active_mic', name: 'Current active microphone' } // Numeric variable containing the ID of the currently active microphone, or 0 if no microphones are active
 	])
 }
